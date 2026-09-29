@@ -40,6 +40,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Show app Gradle file
+        run: |
+          echo "===== APP GRADLE FILE ====="
+          cat android-project/NexaVisionAI/app/build.gradle.kts
+
       - name: Align Java and Kotlin JVM targets
         run: |
           cat >> android-project/NexaVisionAI/app/build.gradle.kts <<'EOF'
