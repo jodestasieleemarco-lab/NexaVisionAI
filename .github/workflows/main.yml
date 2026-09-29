@@ -37,17 +37,19 @@ jobs:
           mkdir -p android-project
           unzip -q NexaVisionAI_Android_Project_v0.5_GitHubBuild.zip -d android-project
 
-          echo "===== ZIP CONTENTS ====="
-          find android-project -maxdepth 6 -type f | sort
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-          echo "===== GRADLE FILES ====="
-          find android-project -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" -o -name "build.gradle" -o -name "build.gradle.kts" -o -name "gradlew" \) -print
+      - name: Build Debug APK
+        run: |
+          cd android-project/NexaVisionAI
+          gradle assembleDebug
 
-          echo "===== DIRECTORY STRUCTURE ====="
-          find android-project -maxdepth 4 -type d | sort
-
-          echo "Diagnostic complete."
-
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexaVisionAI-debug-apk
+          path: android-project/NexaVisionAI/app/build/outputs/apk/debug/*.apk
 
 
 
