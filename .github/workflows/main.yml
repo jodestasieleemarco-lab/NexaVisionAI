@@ -37,37 +37,22 @@ jobs:
           mkdir -p android-project
           unzip -q NexaVisionAI_Android_Project_v0.5_GitHubBuild.zip -d android-project
 
-          echo "Searching for Gradle wrapper..."
-          GRADLEW=$(find android-project -type f -name gradlew -print -quit)
+          echo "===== ZIP CONTENTS ====="
+          find android-project -maxdepth 6 -type f | sort
 
-          if [ -z "$GRADLEW" ]; then
-            echo "ERROR: gradlew was not found inside the ZIP."
-            exit 1
-          fi
+          echo "===== GRADLE FILES ====="
+          find android-project -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" -o -name "build.gradle" -o -name "build.gradle.kts" -o -name "gradlew" \) -print
 
-          PROJECT_DIR=$(dirname "$GRADLEW")
+          echo "===== DIRECTORY STRUCTURE ====="
+          find android-project -maxdepth 4 -type d | sort
 
-          echo "Gradle wrapper found at: $GRADLEW"
-          echo "Project directory: $PROJECT_DIR"
-
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-
-      - name: Make Gradle executable
-        run: chmod +x "$PROJECT_DIR/gradlew"
-
-      - name: Build Debug APK
-        run: |
-          cd "$PROJECT_DIR"
-          ./gradlew assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: NexaVisionAI-debug-apk
-          path: |
-            android-project/**/build/outputs/apk/debug/*.apk
+          echo "Diagnostic complete."
 
 
+
+      
+
+      - 
 
 
 
