@@ -40,6 +40,22 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Align Java and Kotlin JVM targets
+        run: |
+          cat >> android-project/NexaVisionAI/app/build.gradle.kts <<'EOF'
+
+          android {
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+          }
+
+          kotlin {
+              jvmToolchain(17)
+          }
+          EOF
+
       - name: Build Debug APK
         run: |
           cd android-project/NexaVisionAI
@@ -50,11 +66,3 @@ jobs:
         with:
           name: NexaVisionAI-debug-apk
           path: android-project/NexaVisionAI/app/build/outputs/apk/debug/*.apk
-
-
-
-
-
-
-
-          
