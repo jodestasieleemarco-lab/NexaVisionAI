@@ -20,25 +20,25 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Locate Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          sdkmanager --version
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Find and extract NexaVision AI project
         run: |
-          ZIP_FILE=$(find . -maxdepth 2 -type f -name "*.zip" | head -n 1)
+          ZIP_FILE=$(find . -type f -name "*.zip" | head -n 1)
 
           if [ -z "$ZIP_FILE" ]; then
-            echo "NexaVision AI ZIP file not found."
+            echo "NexaVision AI ZIP not found"
             exit 1
           fi
-
-          echo "Found: $ZIP_FILE"
 
           mkdir -p extracted
           unzip -o "$ZIP_FILE" -d extracted
@@ -46,28 +46,25 @@ jobs:
           SETTINGS_FILE=$(find extracted -type f -name "settings.gradle.kts" | head -n 1)
 
           if [ -z "$SETTINGS_FILE" ]; then
-            echo "settings.gradle.kts was not found."
+            echo "settings.gradle.kts not found"
             exit 1
           fi
 
           PROJECT_DIR=$(dirname "$SETTINGS_FILE")
-
-          echo "Project directory: $PROJECT_DIR"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
-      - name: Install Gradle 8.9
+      - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Build NexaVision AI Debug APK
+      - name: Build NexaVision AI APK
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
           gradle :app:assembleDebug --no-daemon
 
-      - name: Upload NexaVision AI APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: NexaVision-AI-debug-apk
           path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
